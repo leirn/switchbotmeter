@@ -76,6 +76,7 @@ class Device:
         - date: Date of the current scan
         - temp: Temperature as reported by the meter
         - humidity: Humidity, percentage.
+        - battery: Battery, percentage.
         - data: Complete dict with all the data minus the mac.
 
     Arguments:
@@ -132,7 +133,8 @@ class Device:
             return (
                 f'<{self.data["model"]} ({self.data["mode"]}) '
                 f'temp: {self.data["temp"]:.2f} '
-                f'humidity: {self.data["humidity"]}%> ({self.mac})'
+                f'humidity: {self.data["humidity"]}%'
+                f'battery: {self.data["battery"]}%> ({self.mac})'
             )
         return "Unknown device"
 
@@ -149,6 +151,7 @@ class Device:
         self.data = {
             "model": hexv[2:3].decode(),
             "mode": hexv[3:4].hex(),
+            "battery": hexv[4] & 0b01111111,
             "date": datetime.datetime.now(tz=datetime.timezone.utc),
             "temp": int(hexv[6:7].hex(), 16) - 128 + (hexv[5] / 10),
             "humidity": hexv[7],
